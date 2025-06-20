@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OECD組織構造と定期刊行物マッピング</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            padding: 40px;
+        }
+        
+        .two-pillar-structure {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        
+        .pillar {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 30px;
+            border-left: 6px solid #2a5298;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        
+        .pillar:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .pillar h2 {
+            color: #1e3c72;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .pillar-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #2a5298, #667eea);
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2em;
+        }
+        
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .directorates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .directorate-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            padding: 25px;
+            border-top: 4px solid;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .directorate-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+        }
+        
+        .directorate-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-start), var(--color-end));
+        }
+        
+        .economics { --color-start: #4CAF50; --color-end: #45a049; border-top-color: #4CAF50; }
+        .education { --color-start: #2196F3; --color-end: #1976D2; border-top-color: #2196F3; }
+        .health { --color-start: #f44336; --color-end: #d32f2f; border-top-color: #f44336; }
+        .environment { --color-start: #4CAF50; --color-end: #388E3C; border-top-color: #4CAF50; }
+        .governance { --color-start: #9C27B0; --color-end: #7B1FA2; border-top-color: #9C27B0; }
+        .science { --color-start: #FF9800; --color-end: #F57C00; border-top-color: #FF9800; }
+        .trade { --color-start: #607D8B; --color-end: #455A64; border-top-color: #607D8B; }
+        .development { --color-start: #795548; --color-end: #5D4037; border-top-color: #795548; }
+        .statistics { --color-start: #3F51B5; --color-end: #303F9F; border-top-color: #3F51B5; }
+        
+        .directorate-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .directorate-code {
+            background: #f0f0f0;
+            color: #666;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        
+        .publications-list {
+            margin-top: 15px;
+        }
+        
+        .publications-list h4 {
+            color: #444;
+            font-size: 1em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .publications-list h4::before {
+            content: "📚";
+            margin-right: 8px;
+        }
+        
+        .publication-item {
+            background: #f8f9ff;
+            padding: 10px 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border-left: 3px solid var(--color-start);
+            font-size: 0.9em;
+            transition: all 0.2s ease;
+        }
+        
+        .publication-item:hover {
+            background: #eef2ff;
+            transform: translateX(5px);
+        }
+        
+        .publication-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .publication-frequency {
+            color: #666;
+            font-size: 0.8em;
+        }
+        
+        .country-desk-section {
+            margin-top: 50px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%);
+            border-radius: 15px;
+            padding: 30px;
+        }
+        
+        .country-desk-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .country-desk-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .country-desk-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .legend {
+            background: #f0f4ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .legend h3 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+        }
+        
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .two-pillar-structure {
+                grid-template-columns: 1fr;
+            }
+            
+            .directorates-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>OECD組織構造と定期刊行物マッピング</h1>
+            <p>経済協力開発機構（OECD）事務局の2大ピラー構造と刊行物体系</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="two-pillar-structure">
+                <div class="pillar">
+                    <h2>
+                        <div class="pillar-icon">🌍</div>
+                        第1ピラー: テーマ別部門群
+                    </h2>
+                    <div class="description">
+                        <strong>9つの専門部門</strong>が政策分野別に専門化。各部門が独自の刊行物シリーズを発行し、分野横断的な国際比較分析を実施。
+                    </div>
+                    <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; font-size: 0.9em;">
+                        <strong>含まれる部門:</strong> 教育技能（EDU）、雇用労働社会（ELS）、環境（ENV）、科学技術イノベーション（STI）、貿易農業（TAD）、公共ガバナンス（GOV）、開発協力（DCD）、統計データ（SDD）、金融企業（DAF）
+                    </div>
+                </div>
+                
+                <div class="pillar">
+                    <h2>
+                        <div class="pillar-icon">🏛️</div>
+                        第2ピラー: カントリーデスク
+                    </h2>
+                    <div class="description">
+                        <strong>経済部門（ECO）内の特別構造</strong>。38加盟国それぞれに専門エコノミストチームを配置し、国別の深い経済分析を実施。
+                    </div>
+                    <div style="background: #e8f0ff; padding: 15px; border-radius: 8px; font-size: 0.9em;">
+                        <strong>体制:</strong> Luiz de Mello統括のもと、各国専門デスクがEconomic Surveys作成。Chief Economist（Álvaro Santos Pereira）がEconomic Outlook全体を指揮。
+                    </div>
+                </div>
+            </div>
+            
+            <div class="directorates-grid">
+                <div class="directorate-card economics">
+                    <div class="directorate-name">経済部門</div>
+                    <div class="directorate-code">ECO</div>
+                    <div style="background: #e8f5e8; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em;">
+                        <strong>チーフエコノミスト:</strong> Álvaro Santos Pereira<br>
+                        <small>Chief Economist & G20 Finance Deputy / 元ポルトガル経済大臣</small><br>
+                        <strong>カントリー研究部門長:</strong> Luiz de Mello<br>
+                        <small>Director, Country Studies Branch / Economic Surveys統括</small>
+                    </div>
+                    <div class="publications-list">
+                        <h4>主要刊行物</h4>
+                        <div class="publication-item">
+                            <div class="publication-title">OECD Economic Outlook</div>
+                            <div class="publication-frequency">年2回 + 中間報告</div>
+                        </div>
+                        <div class="publication-item">
+                            <div class="publication-title">OECD Economic Surveys</div>
+                            <div class="publication-frequency">各国18ヶ月-2年に1回</div>
+                        </div>
+                        <div class="publication-item">
+                            <div class="publication-title">Economics Department Working Papers</div>
+                            <div class="publication-frequency">継続的発行</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="directorate-card education">
+                    <div class="directorate-name">教育技能部門</div>
+                    <div class="directorate-code">EDU</div>
+                    <div style="background: #e8f0ff; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em;">
+                        <strong>部門長:</strong> Andreas Schleicher<br>
+                        <small>Director for Education and Skills / PISA創設者</small>
+                    </div>
+                    <div class="publications-list">
+                        <h4>主要刊行物</h4>
+                        <div class="publication-item">
+                            <div class="publication-title">Education at a Glance</div>
+                            <div class="publication-frequency">年1回</div>
+                        </div>
+                        <div class="publication-item">
+                            <div class="publication-title">OECD Education Working Papers</div>
+                            <div class="publication-frequency">継続的発行</div>
+                        </div>
+                        <div class="publication-item">
+                            <div class="publication-title">Measuring Innovation in Education</div>
+                            <div class="publication-frequency">定期的</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="directorate-card health">
+                    <div class="directorate-name">雇用労働社会問題部門</div>
+                    <div class="directorate-code">ELS</div>
+                    <div style="background: #fef0f0; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em;">
+                        <strong>部門長:</strong> Stefano Scarpetta<br>
+                        <small>Director for Employment, Labour and Social Affairs / 労働市場専門家</small>
+                    </div>
+                    <div class="publications-list">
+                        <h4>主要刊行物</h4>
+                        <div class="publication-item">
+                            <div class="publication-title">Health at a Glance</div>
+                            <div class="publication-frequency">年1回</div>
+                        </div>
+                        <div class="publication-item">
+                            <div class="publication-title">OECD Employment Outlook</div>
+                            <div class="publication-frequency">年1回</div>
+                        </div>
+                        <div class="publication-item">
+                            <div class="publication-title">Health Working Papers</div>
+                            <div class="publication-frequency">継続的発行</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="directorate-card environment">
+                    <div class="directorate-name">環境部門</div>
+                    <div class="directorate-code">ENV</div>
+                    <div style="background: #e8f5e8; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em;">
+                        <strong>部門長:</strong> Rodolfo Lacy<br>
+                        <small>Director, Environment Directorate / 元メキシコ気候変動首席交渉官</small>
+                    </div>
+                    <div class="publications-list">
+                        <h4>主要刊行物</h4>
+                        <div class="publication-item">
+                            <div class="publication-title">Environment at a Glance</div>
+                            <div class="publication-frequency">隔年</div>
+                        </div>
+                        <div class="publication-item">
+                            <div class="publication-title">OECD Environmental Outlook</div>
+                            <div class="publication-frequency">数年おき</div>
+                        </div>
+                        <div class="publication-item">
+                            <div class="publication-title">Environment Working Papers</div>
+                            <div class="publication-frequency">継続的発行</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="directorate-card governance">
+                    <div class="directorate-name">公共ガバナンス・地域開発部門</div>
+                    <div class="directorate-code">GOV</div>
+                    <div class="publications-list">
+                        <h4>主要刊行物</h4>
+                        <div class="publication-item">
+                            <div class="publication-title">Regulatory Policy Working Papers</div>
+                            <div class="publication-frequency">継続的発行</div>
+                        </div>
+                        <div class="publication-item">
+                            <div class="publication-title">Public Governance Working Papers</div>
+                            <div class="publication-frequency">継続的発行</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="directorate-card science">
+                    <div class="directorate-name">科学技術イノベーション部門</div>
+                    <div class="directorate-code">STI</div>
+                    <div style="background: #fff8e8; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em;">
+                        <strong>前部門長:</strong> Andrew W. Wyckoff<br>
+                        <small>現在はBrookings Institution非常勤シニアフェロー / AI政策専門家</small>
+                    </div>
+                    <div class="publications-list">
+                        <h4>主要刊行物</h4>
+                        <div class="publication-item">
+                            <div class="publication-title">Science, Technology and Innovation Outlook</div>
+                            <div class="publication-frequency">隔年</div>
+                        </div>
+                        <div class="publication-item">
+                            <div class="publication-title">Main Science and Technology Indicators</div>
+                            <div class="publication-frequency">継続的発行</div>
+                        </div>
+                        <div class="publication-item">
+                            <div class="publication-title">STI Working Papers</div>
+                            <div class="publication-frequency">継続的発行</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="directorate-card trade">
+                    <div class="directorate-name">貿易農業部門</div>
+                    <div class="directorate-code">TAD</div>
+                    <div style="background: #f0f4f8; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9em;">
+                        <strong>部門長:</strong> Marion Jansen<br>
+                        <small>Director, Trade and Agriculture Directorate / 元WTO上級エコノミスト</small>
+                    </div>
+                    <div class="publications-list">
+                        <h4>主要刊行物</h4>
+                        <div class="publication-item">
+                            <div class="publication-title">Trade and Agriculture Working Papers</div>
+                            <div class="publication-frequency">継続的発行</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="directorate-card development">
+                    <div class="directorate-name">開発協力部門</div>
+                    <div class="directorate-code">DCD</div>
+                    <div class="publications-list">
+                        <h4>主要刊行物</h4>
+                        <div class="publication-item">
+                            <div class="publication-title">Development Working Papers</div>
+                            <div class="publication-frequency">継続的発行</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="directorate-card statistics">
+                    <div class="directorate-name">統計データ部門</div>
+                    <div class="directorate-code">SDD</div>
+                    <div class="publications-list">
+                        <h4>主要刊行物</h4>
+                        <div class="publication-item">
+                            <div class="publication-title">OECD Health Statistics</div>
+                            <div class="publication-frequency">継続更新</div>
+                        </div>
+                        <div class="publication-item">
+                            <div class="publication-title">Statistics Working Papers</div>
+                            <div class="publication-frequency">継続的発行</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="country-desk-section">
+                <h3 style="color: #1e3c72; margin-bottom: 20px; font-size: 1.4em;">🏛️ 第2ピラー詳細: カントリーデスク構造（経済部門ECO内）</h3>
+                <div style="background: #f0f4ff; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h4 style="color: #1e3c72; margin-bottom: 10px;">組織構造</h4>
+                    <p style="margin-bottom: 10px;"><strong>Chief Economist:</strong> Álvaro Santos Pereira（全体統括・Economic Outlook責任者）</p>
+                    <p style="margin-bottom: 10px;"><strong>Country Studies Director:</strong> Luiz de Mello（38カ国のEconomic Surveys統括）</p>
+                    <p style="color: #666;">各加盟国に専門エコノミストチームを配置し、18-24ヶ月に1度のEconomic Surveysを作成</p>
+                </div>
+                <div class="country-desk-grid">
+                    <div class="country-desk-item">
+                        <strong>米国デスク</strong><br>
+                        <small>United States</small>
+                    </div>
+                    <div class="country-desk-item">
+                        <strong>日本デスク</strong><br>
+                        <small>Japan</small>
+                    </div>
+                    <div class="country-desk-item">
+                        <strong>ドイツデスク</strong><br>
+                        <small>Germany</small>
+                    </div>
+                    <div class="country-desk-item">
+                        <strong>フランスデスク</strong><br>
+                        <small>France</small>
+                    </div>
+                    <div class="country-desk-item">
+                        <strong>韓国デスク</strong><br>
+                        <small>Korea</small>
+                    </div>
+                    <div class="country-desk-item">
+                        <strong>その他33カ国</strong><br>
+                        <small>Other OECD Members</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="legend">
+                <h3>📊 刊行物発行頻度凡例</h3>
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #4CAF50;"></div>
+                        年2回発行（Economic Outlook等）
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #2196F3;"></div>
+                        年1回発行（at a Glance シリーズ）
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #FF9800;"></div>
+                        隔年発行（Outlook シリーズ）
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #9C27B0;"></div>
+                        継続的発行（Working Papers）
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
